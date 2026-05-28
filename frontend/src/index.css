@@ -1,0 +1,337 @@
+:root {
+  /* Font Families */
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Grotesk', 'Courier New', monospace;
+
+  /* Theme Colors (Limbus Company Dark/Industrial Aesthetic) */
+  --bg-darker: #08090b;
+  --bg-dark: #0f1115;
+  --bg-card: rgba(22, 25, 30, 0.75);
+  --bg-card-hover: rgba(30, 34, 40, 0.85);
+  --border-metallic: rgba(255, 255, 255, 0.08);
+  --border-metallic-hover: rgba(255, 255, 255, 0.18);
+  
+  --color-text-primary: #f0f2f5;
+  --color-text-secondary: #9aa2af;
+  --color-text-muted: #626975;
+  
+  --color-accent-crimson: #a92020;
+  --color-accent-crimson-glow: rgba(169, 32, 32, 0.4);
+  --color-accent-gold: #c8963e;
+  --color-accent-gold-glow: rgba(200, 150, 62, 0.3);
+
+  /* Sin Affinities HSL Colors (Tailored and Vibrant) */
+  --sin-wrath: hsl(355, 78%, 52%);       /* Wrath (Crimson) */
+  --sin-lust: hsl(26, 92%, 50%);         /* Lust (Orange) */
+  --sin-sloth: hsl(48, 88%, 48%);        /* Sloth (Yellow) */
+  --sin-gluttony: hsl(116, 54%, 44%);    /* Gluttony (Green) */
+  --sin-gloom: hsl(200, 72%, 48%);       /* Gloom (Light Blue) */
+  --sin-pride: hsl(222, 76%, 50%);       /* Pride (Deep Blue) */
+  --sin-envy: hsl(280, 66%, 52%);        /* Envy (Purple) */
+  --sin-defense: hsl(200, 6%, 50%);      /* Neutral / Defense (Grey) */
+
+  /* Rarity Colors */
+  --rarity-3: #ffae19;
+  --rarity-2: #c085ff;
+  --rarity-1: #94a3b8;
+
+  /* Shadows & Backdrops */
+  --shadow-main: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --shadow-neon-crimson: 0 0 15px rgba(169, 32, 32, 0.25);
+  --shadow-neon-gold: 0 0 15px rgba(200, 150, 62, 0.25);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-crimson) var(--bg-darker);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-darker);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(169, 32, 32, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(200, 150, 62, 0.03) 0%, transparent 50%),
+    linear-gradient(to bottom, #08090b, #0e1115);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-crimson);
+}
+
+/* Glassmorphism Containers */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-metallic);
+  border-radius: 8px;
+  box-shadow: var(--shadow-main);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-metallic-hover);
+}
+
+/* Typography Utilities */
+.text-glow-crimson {
+  text-shadow: 0 0 10px var(--color-accent-crimson-glow);
+}
+.text-glow-gold {
+  text-shadow: 0 0 10px var(--color-accent-gold-glow);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Layout Classes */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 100vh;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid var(--color-accent-crimson);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-gold), transparent);
+  animation: scan-line 3s linear infinite;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-logo span {
+  color: var(--color-accent-crimson);
+}
+
+.brand-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.team-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-accent-crimson), #7e1212);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(169, 32, 32, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(169, 32, 32, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  border: 1px solid var(--border-metallic);
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-metallic-hover);
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-metallic);
+  color: var(--color-text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-accent-crimson);
+  background: rgba(169, 32, 32, 0.1);
+}
+
+/* Animations */
+@keyframes scan-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.pulse-glow-crimson {
+  animation: pulse-glow-crimson-anim 2s infinite alternate;
+}
+
+@keyframes pulse-glow-crimson-anim {
+  0% { box-shadow: 0 0 5px rgba(169, 32, 32, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(169, 32, 32, 0.6); }
+}
+
+/* Grid & Dashboard layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dropdowns / Inputs */
+.select-input {
+  background: var(--bg-darker);
+  color: var(--color-text-primary);
+  border: 1px solid var(--border-metallic);
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select-input:hover, .select-input:focus {
+  border-color: var(--color-accent-gold);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+/* Toast Notifications */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--bg-dark);
+  border-left: 4px solid var(--color-accent-gold);
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 2000;
+  transform: translateY(100px);
+  animation: slide-up 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slide-up {
+  to { transform: translateY(0); }
+}
