@@ -17,7 +17,7 @@ interface SelectionModalProps {
   onSelectSinner?: (sinner: Sinner) => void;
 }
 
-export const SelectionModal: React.FC<SelectionModalProps> = ({
+const SelectionModalComponent: React.FC<SelectionModalProps> = ({
   isOpen,
   onClose,
   type,
@@ -50,7 +50,7 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({
   };
 
   const getRarityStars = (rarity: number) => {
-    return Array(rarity).fill(0).map((_, i) => (
+    return Array(rarity).fill(0).map((_: number, i: number) => (
       <Star key={i} size={14} className="fill-current text-[var(--color-accent-gold)]" />
     ));
   };
@@ -431,3 +431,5 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({
     </div>
   );
 };
+
+export const SelectionModal = React.memo(SelectionModalComponent) as React.FC<SelectionModalProps>;

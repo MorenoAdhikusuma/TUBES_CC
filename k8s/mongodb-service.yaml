@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: limbus-mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: limbus-mongodb
+  ports:
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+apiVersion: v1
+kind: Service
+metadata:
+  name: limbus-mongodb
+spec:
+  selector:
+    app: limbus-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

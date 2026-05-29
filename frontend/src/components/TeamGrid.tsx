@@ -8,7 +8,7 @@ interface TeamGridProps {
   onRemoveSlot: (slotIndex: number) => void;
 }
 
-export const TeamGrid: React.FC<TeamGridProps> = ({
+const TeamGridComponent: React.FC<TeamGridProps> = ({
   slots,
   onOpenSelector,
   onRemoveSlot
@@ -354,3 +354,5 @@ export const TeamGrid: React.FC<TeamGridProps> = ({
     </div>
   );
 };
+
+export const TeamGrid = React.memo(TeamGridComponent) as React.FC<TeamGridProps>;

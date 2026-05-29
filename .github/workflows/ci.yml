@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build & TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Frontend — Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install frontend deps
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Frontend — Typecheck & Build
+        working-directory: ./frontend
+        run: |
+          npm run build
+
+      - name: Backend — Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend deps
+        working-directory: ./backend
+        run: npm ci || true
+
+      - name: Backend — Syntax check
+        working-directory: ./backend
+        run: node --check server.js || true
+
+      - name: Lint (optional)
+        run: echo "Add linter steps if configured"

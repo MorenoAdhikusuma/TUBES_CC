@@ -1,0 +1,29 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubeconfig
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          echo "$KUBE_CONFIG_DATA" | base64 --decode > kubeconfig
+          mkdir -p $HOME/.kube
+          mv kubeconfig $HOME/.kube/config
+
+      - name: Deploy Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/ --recursive

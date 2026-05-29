@@ -247,6 +247,62 @@ Removes all containers but preserves MongoDB data in the volume.
 
 ---
 
+### How to start (quick commands)
+
+Use these quick, copy-paste commands depending on your preferred workflow.
+
+- Docker Compose (build + run in background):
+
+```powershell
+# from repository root
+docker-compose build
+docker-compose up -d
+
+# check services
+docker-compose ps
+```
+
+- Stop and remove containers (preserve volumes):
+
+```powershell
+docker-compose down
+```
+
+- Start using the provided convenience scripts (Windows PowerShell):
+
+```powershell
+# One-time setup (installs/builds)
+.\setup.ps1
+
+# Start stack (uses docker-compose)
+.\start.ps1
+```
+
+- Run frontend and backend locally without Docker (dev mode):
+
+```powershell
+# Frontend
+cd frontend
+npm install
+npm run dev
+
+# Backend (in a separate terminal)
+cd backend
+npm install
+npm run dev
+```
+
+- Vagrant (isolated VM, recommended for consistent environment):
+
+```powershell
+cd C:\path\to\RAFI\CC
+vagrant up
+# then open: http://localhost:3000
+```
+
+If you need additional details (ports, env vars, or to push images to GHCR), see the Docker and CI sections further down.
+---
+
 ## 📂 Project Structure
 
 ```
@@ -397,6 +453,71 @@ docker exec limbus-backend npm run seed
 ---
 
 ## 🐛 Troubleshooting
+Common problems and quick fixes when running locally or in Vagrant/Docker.
+
+- **Backend health endpoint returns error / not reachable**:
+  - Check backend logs:
+
+```powershell
+docker-compose logs -f limbus-backend
+```
+
+  - Verify `MONGODB_URI` is correct (in Docker Compose it's `mongodb://mongodb:27017/limbus_teams`).
+  - Confirm MongoDB container is running:
+
+```powershell
+docker-compose ps
+```
+
+- **MongoDB connection refused / authentication issues**:
+  - Ensure the `limbus-mongodb` container is up and healthy.
+  - If using Vagrant, ensure port forwarding allows access or run commands inside the VM (`vagrant ssh`).
+  - Check volume permissions if the DB fails to start (inspect container logs).
+
+- **Frontend shows build errors or blank page**:
+  - Build locally to see TypeScript errors:
+
+```powershell
+cd frontend
+npm install
+npx tsc --noEmit
+npm run build
+```
+
+  - If `JSX.IntrinsicElements` or React types fail, ensure `frontend/tsconfig.json` includes `types: ["vite/client","react"]` and `@types/react` is installed.
+
+- **Port collision (3000, 5000, 27017)**:
+  - Find the process using the port and stop it, or change mapped ports in `docker-compose.yml`.
+
+```powershell
+netstat -ano | findstr :3000
+taskkill /PID <pid> /F
+```
+
+- **Containers failing to rebuild or stale content during dev**:
+  - Rebuild images and remove old containers:
+
+```powershell
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+- **Database reseeding**:
+  - Reseed from the host:
+
+```powershell
+docker exec limbus-backend npm run seed
+```
+
+- **Pushing images to GHCR fails (permissions/auth)**:
+  - Ensure `GITHUB_TOKEN` or a personal access token with `write:packages` is available in Actions or local login:
+
+```bash
+echo $CR_PAT | docker login ghcr.io -u <username> --password-stdin
+```
+
+If you still face issues, collect logs from the backend and MongoDB containers and open an issue including the error lines from `docker-compose logs --tail=200`.
 
 ### Vagrant Issues
 

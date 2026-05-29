@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sinner, Identity, Ego, Team, TeamSlotPopulated } from './types';
 import { TeamGrid } from './components/TeamGrid';
 import { SynergyDashboard } from './components/SynergyDashboard';
@@ -7,7 +7,7 @@ import { Save, FolderOpen, Trash2, Sparkles, RefreshCw, Info, Check } from 'luci
 
 const API_BASE = '/api';
 
-export default function App() {
+export default function App(): React.ReactElement {
   const [sinners, setSinners] = useState<Sinner[]>([]);
   const [identities, setIdentities] = useState<Identity[]>([]);
   const [egos, setEgos] = useState<Ego[]>([]);
@@ -38,7 +38,7 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Load initial data
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -74,18 +74,18 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchData();
   }, []);
 
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
+  React.useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
 
-  const loadTeamIntoWorkspace = (team: Team) => {
+  const triggerToast = React.useCallback((msg: string) => {
+    setToastMessage(msg);
+    window.setTimeout(() => setToastMessage(null), 3000);
+  }, []);
+
+  const loadTeamIntoWorkspace = React.useCallback((team: Team): void => {
     // Fill current slots from team
     const newSlots = initialSlots.map((emptySlot, idx) => {
       if (team.slots && team.slots[idx]) {
@@ -97,15 +97,15 @@ export default function App() {
     setTeamName(team.name);
     setTeamDescription(team.description || '');
     setActiveTeamId(team._id || null);
-  };
+  }, [initialSlots]);
 
-  const handleOpenSelector = (slotIndex: number, type: 'identity' | 'ego' | 'sinner') => {
+  const handleOpenSelector = React.useCallback((slotIndex: number, type: 'identity' | 'ego' | 'sinner') => {
     setActiveSlotIndex(slotIndex);
     setSelectorType(type);
     setSelectorOpen(true);
-  };
+  }, []);
 
-  const handleSelectSinner = (sinner: Sinner) => {
+  const handleSelectSinner = React.useCallback((sinner: Sinner) => {
     // Automatically find and select the base identity (rarity 1)
     const baseIdentity = identities.find((id: Identity) => id.sinnerId === sinner.id && id.rarity === 1) || null;
     // Automatically equip the base EGO (ZAYIN risk level)
@@ -120,9 +120,9 @@ export default function App() {
     setCurrentSlots(updated);
     setSelectorOpen(false);
     triggerToast(`Deployed Sinner ${sinner.name} to slot ${activeSlotIndex + 1}`);
-  };
+  }, [currentSlots, activeSlotIndex, identities, egos, triggerToast]);
 
-  const handleSelectIdentity = (identity: Identity) => {
+  const handleSelectIdentity = React.useCallback((identity: Identity) => {
     const updated = [...currentSlots];
     updated[activeSlotIndex] = {
       ...updated[activeSlotIndex],
@@ -131,22 +131,19 @@ export default function App() {
     setCurrentSlots(updated);
     setSelectorOpen(false);
     triggerToast(`Selected Identity: ${identity.name}`);
-  };
+  }, [currentSlots, activeSlotIndex, triggerToast]);
 
-  const handleToggleEgo = (ego: Ego) => {
+  const handleToggleEgo = React.useCallback((ego: Ego) => {
     const updated = [...currentSlots];
     const slot = updated[activeSlotIndex];
-    
-    // Check if EGO already equipped
+
     const alreadyEquippedIndex = slot.egoIds.findIndex((e: Ego) => e._id === ego._id);
     let newEgoIds = [...slot.egoIds];
-    
+
     if (alreadyEquippedIndex > -1) {
       newEgoIds.splice(alreadyEquippedIndex, 1);
       triggerToast(`Unequipped E.G.O: ${ego.name}`);
     } else {
-      // In Limbus, a character typically equips only one E.G.O per riskLevel
-      // Remove any other equipped E.G.O of same risk level first
       newEgoIds = newEgoIds.filter((e: Ego) => e.riskLevel !== ego.riskLevel);
       newEgoIds.push(ego);
       triggerToast(`Equipped E.G.O: ${ego.name}`);
@@ -157,9 +154,9 @@ export default function App() {
       egoIds: newEgoIds
     };
     setCurrentSlots(updated);
-  };
+  }, [currentSlots, activeSlotIndex, triggerToast]);
 
-  const handleRemoveSlot = (slotIndex: number) => {
+  const handleRemoveSlot = React.useCallback((slotIndex: number) => {
     const updated = [...currentSlots];
     updated[slotIndex] = {
       sinnerId: '',
@@ -168,9 +165,9 @@ export default function App() {
     };
     setCurrentSlots(updated);
     triggerToast(`Removed Sinner from slot ${slotIndex + 1}`);
-  };
+  }, [currentSlots, triggerToast]);
 
-  const handleSaveTeam = async () => {
+  const handleSaveTeam = React.useCallback(async (): Promise<void> => {
     if (!teamName.trim()) {
       alert('Please enter a team name');
       return;
@@ -209,9 +206,9 @@ export default function App() {
     } catch (err: any) {
       alert(err.message || 'Error saving team');
     }
-  };
+  }, [currentSlots, teamName, teamDescription, triggerToast]);
 
-  const handleDeleteTeam = async (id: string, e: React.MouseEvent) => {
+  const handleDeleteTeam = React.useCallback(async (id: string, e: React.MouseEvent): Promise<void> => {
     e.stopPropagation(); // prevent loading team upon delete click
     if (!confirm('Are you sure you want to delete this team composition?')) return;
 
@@ -233,17 +230,17 @@ export default function App() {
     } catch (err: any) {
       alert(err.message || 'Error deleting team');
     }
-  };
+  }, [activeTeamId, triggerToast]);
 
-  const clearWorkspace = () => {
+  const clearWorkspace = React.useCallback(() => {
     setCurrentSlots(initialSlots);
     setTeamName('New Tactical Team');
     setTeamDescription('Custom team configuration');
     setActiveTeamId(null);
     triggerToast('Cleared active workspace.');
-  };
+  }, [initialSlots, triggerToast]);
 
-  const handleSeedDatabase = async () => {
+  const handleSeedDatabase = React.useCallback(async (): Promise<void> => {
     try {
       triggerToast('Re-seeding database...');
       const res = await fetch(`${API_BASE}/seed`, { method: 'POST' });
@@ -253,23 +250,25 @@ export default function App() {
     } catch (err: any) {
       alert(err.message || 'Error seeding database');
     }
-  };
+  }, [fetchData, triggerToast]);
 
   // Get selector modal list properties
-  const getSelectorModalProps = () => {
-    const activeSlot = currentSlots[activeSlotIndex];
-    const slotSinnerName = activeSlot?.sinnerId 
-      ? activeSlot.sinnerId.replace('_', ' ').toUpperCase()
-      : 'Sinner';
+  const getSelectorModalProps = React.useMemo(() => {
+    return () => {
+      const activeSlot = currentSlots[activeSlotIndex];
+      const slotSinnerName = activeSlot?.sinnerId 
+        ? activeSlot.sinnerId.replace('_', ' ').toUpperCase()
+        : 'Sinner';
 
-    return {
-      sinnerName: slotSinnerName,
-      identities: identities.filter((id: Identity) => id.sinnerId === activeSlot?.sinnerId),
-      egos: egos.filter((ego: Ego) => ego.sinnerId === activeSlot?.sinnerId),
-      activeIdentityId: activeSlot?.identityId?._id || undefined,
-      activeEgoIds: activeSlot?.egoIds.map((e: Ego) => e._id) || []
+      return {
+        sinnerName: slotSinnerName,
+        identities: identities.filter((id: Identity) => id.sinnerId === activeSlot?.sinnerId),
+        egos: egos.filter((ego: Ego) => ego.sinnerId === activeSlot?.sinnerId),
+        activeIdentityId: activeSlot?.identityId?._id || undefined,
+        activeEgoIds: activeSlot?.egoIds.map((e: Ego) => e._id) || []
+      };
     };
-  };
+  }, [currentSlots, activeSlotIndex, identities, egos]);
 
   return (
     <div className="app-container">

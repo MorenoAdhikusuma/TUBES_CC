@@ -6,7 +6,7 @@ interface SynergyDashboardProps {
   slots: TeamSlotPopulated[];
 }
 
-export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => {
+const SynergyDashboardComponent: React.FC<SynergyDashboardProps> = ({ slots }) => {
   const sinColors: Record<string, string> = {
     Wrath: 'var(--sin-wrath)',
     Lust: 'var(--sin-lust)',
@@ -18,7 +18,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
     Defense: 'var(--sin-defense)'
   };
 
-  const activeSlots = slots.filter(s => s.sinnerId && s.identityId);
+  const activeSlots = slots.filter((s: TeamSlotPopulated) => s.sinnerId && s.identityId);
 
   // 1. Calculate Sin Production (Weighted: S1=3, S2=2, S3=1)
   const sinProduction: Record<string, number> = {
@@ -30,7 +30,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
     Wrath: 0, Lust: 0, Sloth: 0, Gluttony: 0, Gloom: 0, Pride: 0, Envy: 0
   };
 
-  activeSlots.forEach(slot => {
+  activeSlots.forEach((slot: TeamSlotPopulated) => {
     if (!slot.identityId) return;
     const { s1, s2, s3 } = slot.identityId.skills;
 
@@ -51,7 +51,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
 
   // 2. Calculate EGO Cost requirements
   const allEquippedEgos: Ego[] = [];
-  activeSlots.forEach(slot => {
+  activeSlots.forEach((slot: TeamSlotPopulated) => {
     if (slot.egoIds) {
       allEquippedEgos.push(...slot.egoIds);
     }
@@ -61,7 +61,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
     Wrath: 0, Lust: 0, Sloth: 0, Gluttony: 0, Gloom: 0, Pride: 0, Envy: 0
   };
 
-  allEquippedEgos.forEach(ego => {
+  allEquippedEgos.forEach((ego: Ego) => {
     Object.entries(ego.cost).forEach(([affinity, cost]) => {
       if (affinity in totalEgoCost) {
         totalEgoCost[affinity] += cost;
@@ -74,7 +74,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
   let pierceCount = 0;
   let bluntCount = 0;
 
-  activeSlots.forEach(slot => {
+  activeSlots.forEach((slot: TeamSlotPopulated) => {
     if (!slot.identityId) return;
     const { s1, s2, s3 } = slot.identityId.skills;
     
@@ -102,7 +102,7 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
   let resPierce = { Fatal: 0, Normal: 0, Ineffective: 0 };
   let resBlunt = { Fatal: 0, Normal: 0, Ineffective: 0 };
 
-  activeSlots.forEach(slot => {
+  activeSlots.forEach((slot: TeamSlotPopulated) => {
     if (!slot.identityId) return;
     const { slash, pierce, blunt } = slot.identityId.resistances;
     resSlash[slash as keyof typeof resSlash]++;
@@ -310,3 +310,5 @@ export const SynergyDashboard: React.FC<SynergyDashboardProps> = ({ slots }) => 
     </div>
   );
 };
+
+export const SynergyDashboard = React.memo(SynergyDashboardComponent) as React.FC<SynergyDashboardProps>;
